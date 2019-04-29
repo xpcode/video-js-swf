@@ -5,6 +5,7 @@ package{
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.Base64;
+    import com.videojs.PNGEncoder;
 
     import flash.display.Sprite;
     import flash.display.StageAlign;
@@ -20,6 +21,8 @@ package{
     import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.setTimeout;
+    import flash.display.BitmapData;
+    import flash.geom.Matrix;
 
     [SWF(backgroundColor="#000000", frameRate="60", width="480", height="270")]
     public class VideoJS extends Sprite{
@@ -84,6 +87,7 @@ package{
                 ExternalInterface.addCallback("vjs_pause", onPauseCalled);
                 ExternalInterface.addCallback("vjs_resume", onResumeCalled);
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
+                ExternalInterface.addCallback("vjs_snapshot", onSnapShot);
 
                 // This callback should only be used when in data generation mode as it
                 // will adjust the notion of current time without notifiying the player
@@ -105,6 +109,14 @@ package{
 
             setTimeout(finish, 50);
 
+        }
+
+        private function onSnapShot():* {
+            var bitmapData:BitmapData = new BitmapData(stage.width, stage.height);
+            bitmapData.draw(stage, new Matrix());
+
+            var ba = PNGEncoder.encode(bitmapData);
+            return "data:image/png;base64," + Base64.encode(ba);
         }
 
         private function finish():void{
